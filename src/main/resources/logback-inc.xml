@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+	<property name="log.proj" value="schedule" />
+	<property name="log.base" value="/usr/local/tomcat/logs/${log.proj}" />
+
+	<jmxConfigurator />
+	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<pattern>%date [%thread] [%X{uid} - %X{url}]  %-5level %logger{60} - %msg%n</pattern>
+		</encoder>
+	</appender>
+	<appender name="ERROR-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">	
+		<File>${log.base}/${log.proj}-error.log</File>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch> 
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${log.base}/${log.proj}-error_%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>200MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%date [%thread] [%X{uid} - %X{url}] %-5level %logger{80} - %msg%n</pattern>
+		</layout>
+	</appender>
+	<appender name ="ASYNC-ERROR-APPENDER" class= "ch.qos.logback.classic.AsyncAppender">
+		<discardingThreshold>0</discardingThreshold>
+		<queueSize>1024</queueSize>
+		<appender-ref ref ="ERROR-APPENDER" />
+	</appender>
+	<appender name="COMMON-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">	
+		<File>${log.base}/${log.proj}.log</File>
+		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+			<evaluator>
+				<expression>
+					<![CDATA[ return level >= DEBUG && level <=  WARN; ]]>
+				</expression>
+			</evaluator>
+			<OnMismatch>DENY</OnMismatch>
+			<OnMatch>ACCEPT</OnMatch>
+		</filter>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${log.base}/${log.proj}_%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>200MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%date [%thread] [%X{uid} - %X{url}] %-5level %logger{60} - %msg%n</pattern>
+		</layout>
+	</appender>
+	<appender name ="ASYNC-COMMON-APPENDER" class= "ch.qos.logback.classic.AsyncAppender">
+		<discardingThreshold>0</discardingThreshold>
+		<queueSize>1024</queueSize>
+		<appender-ref ref ="COMMON-APPENDER" />
+	</appender>
+	<appender name="HESSIAN-CLIENT-DIGEST-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>${log.base}/hessian-client-digest.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${log.base}/hessian-client-digest_%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>200MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<pattern>%date [%thread] [%X{uid} - %X{url}] - %msg%n</pattern>
+		</encoder>
+	</appender>
+	<appender name="ASYNC-HESSIAN-CLIENT-DIGEST-APPENDER" class="ch.qos.logback.classic.AsyncAppender">
+		<discardingThreshold>0</discardingThreshold>
+		<appender-ref ref ="HESSIAN-CLIENT-DIGEST-APPENDER" />
+	</appender>
+	<appender name="HESSIAN-SERVICE-DIGEST-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>${log.base}/hessian-service-digest.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${log.base}/hessian-service-digest_%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>200MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<pattern>%date [%thread] [%X{uid} - %X{url}] - %msg%n</pattern>
+		</encoder>
+	</appender>
+	<appender name="ASYNC-HESSIAN-SERVICE-DIGEST-APPENDER" class="ch.qos.logback.classic.AsyncAppender">
+		<discardingThreshold>0</discardingThreshold>
+		<appender-ref ref ="HESSIAN-SERVICE-DIGEST-APPENDER" />
+	</appender>
+	
+	<!-- 应用系统安全日志 start -->
+    <appender name="SECURITY-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">  
+        <File>${log.base}/security.log</File> 
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">  
+            <fileNamePattern>${log.base}/security.%d{yyyy-MM-dd}.log</fileNamePattern>  
+            <maxHistory>30</maxHistory>  
+        </rollingPolicy>  
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">  
+            <pattern>%msg%n</pattern>  
+        </encoder>  
+    </appender>  
+    <appender name ="ASYNC-SECURITY-APPENDER" class= "ch.qos.logback.classic.AsyncAppender"> 
+        <discardingThreshold>0</discardingThreshold> 
+        <queueSize>1024</queueSize> 
+        <appender-ref ref ="SECURITY-APPENDER" /> 
+    </appender> 
+    <logger name="com.sfpay.sypay.common.service.SecurityLogServiceImpl" level="INFO" additivity="false">  
+        <appender-ref ref="ASYNC-SECURITY-APPENDER" />  
+    </logger>  
+    <!-- end -->
+
+	<logger name="HESSIAN-CLIENT-DIGEST" additivity="false">
+		<level value="INFO" />
+		<appender-ref ref="ASYNC-HESSIAN-CLIENT-DIGEST-APPENDER" />
+	</logger>
+	<logger name="HESSIAN-SERVICE-DIGEST" additivity="false">
+		<level value="INFO" />
+		<appender-ref ref="ASYNC-HESSIAN-SERVICE-DIGEST-APPENDER" />
+	</logger>
+	<!--myBatis-->
+	<logger name="org.apache.ibatis" level="ERROR"/>
+	<logger name="java.sql" additivity="false">
+		<level value="ERROR" />
+		<appender-ref ref="stdout" />
+		<appender-ref ref="ASYNC-ERROR-APPENDER" />
+		<appender-ref ref="ASYNC-COMMON-APPENDER" />	 
+	</logger>
+	<logger name="classpath:mapper" level="INFO"/>
+	<root>
+		<level value="INFO" />
+		<appender-ref ref="stdout" />
+		<appender-ref ref="ASYNC-ERROR-APPENDER" />
+		<appender-ref ref="ASYNC-COMMON-APPENDER" />
+	</root>
+</included>

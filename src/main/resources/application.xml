@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd          
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+ 
+ 
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="locations">
+            <list>
+				<!-- <value>classpath*:profiles/report/properties/*.properties</value>  -->
+				<value>classpath:properties/*.properties</value>
+            </list>
+        </property>
+    </bean>
+    
+	<import resource="classpath:beans/beans-*.xml"/>
+	
+	<!-- 自动扫描了所有的XxxxMapper.java，这样就不用一个一个手动配置Mpper的映射了，只要Mapper接口类和Mapper映射文件对应起来就可以了。 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.schedule.**.dao" />
+	</bean>
+	
+	
+	<!-- 激活annotation功能 -->
+	<context:annotation-config />
+	
+	<!-- 激活annotation功能 -->
+	<context:spring-configured />
+
+	<!-- 扫描指定package下所有带有如@services,@resource,并把所注释的注册为Spring Beans,过滤扫描@controller注解 -->
+	<context:component-scan base-package="com.schedule">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	
+	<aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>
+</beans> 

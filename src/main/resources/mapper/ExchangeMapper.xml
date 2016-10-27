@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sfpay.sypay.lottery.dao.IExchangeDao">
+
+   <resultMap id="ExchangeInfoMap"	     type="com.sfpay.sypay.lottery.exchange.valueobject.dto.ExchangeInfo">	
+        <result column="ID"          jdbcType="INTEGER" 	property="id"/>	
+		<result column="MEMBER_NO"          jdbcType="INTEGER" 	property="memberNo"/>	
+		<result column="ORDER_NO"        jdbcType="VARCHAR" 	property="orderNo"/>
+		<result column="LOTTERY_SN"        jdbcType="VARCHAR" 	property="lotterySn"/>
+		<result column="LOTTERY_PAY_NO"       	jdbcType="VARCHAR" 	property="lotteryPayNo"/>	
+		<result column="EX_STATUS"       	jdbcType="VARCHAR" 	property="status"/>
+		<result column="DM"       	jdbcType="VARCHAR" 	property="dm"/>
+		<result column="RETRY_TIMES"       	jdbcType="INTEGER" 	property="retryTimes"/>
+		<result column="PAY_RETRY_TIMES"       	jdbcType="INTEGER" 	property="payRetryTimes"/>
+		<result column="MOBILE"      		jdbcType="VARCHAR" 	property="mobile"/>	
+		<result column="CHANNEL"     		jdbcType="VARCHAR" 	property="channel"/>	
+		<result column="CREATE_TIME"     						property="createTime"/>
+		<result column="UPDATE_TIME"   		 					property="updateTime"/>
+		<result column="BONUS"   		 	jdbcType="BIGINT"	    property="bonus"/>
+		<result column="REASON"   		jdbcType="VARCHAR"		property="reason"/>
+		<result column="PAY_ORDER_NO"   		jdbcType="VARCHAR"		property="payOrderNo"/>
+	</resultMap>
+	
+	<resultMap id="sfcMap"	     type="com.sfpay.sypay.lottery.exchange.valueobject.tmo.SfcHomeResp">	
+        <result column="total_amt"          jdbcType="INTEGER" 	property="totalAmt"/>	
+		<result column="win_cnt"          jdbcType="INTEGER" 	property="winCnt"/>	
+		<result column="max_amt"        jdbcType="VARCHAR" 	property="maxAmt"/>
+	</resultMap>
+	
+	<insert id="createExchangeOrder" parameterType="exchangeInfo" >  
+	 	insert into LOTTERY_EXCHANGE
+	 	(
+	 		ID,MEMBER_NO,ORDER_NO,LOTTERY_SN,LOTTERY_PAY_NO,EX_STATUS,DM,RETRY_TIMES,PAY_RETRY_TIMES,
+	 		MOBILE,CHANNEL,CREATE_TIME,UPDATE_TIME,BONUS,REASON,PAY_ORDER_NO
+	 	)
+	 	values  
+	    (
+	    	SEQ_LOTTERY_EXCHANGE_ID.Nextval,#{memberNo},'SF'||SEQ_ORDER_NO.Nextval,#{lotterySn,jdbcType=VARCHAR},#{lotteryPayNo,jdbcType=VARCHAR},#{status}
+	    	,#{dm,jdbcType=VARCHAR},0,0,#{mobile,jdbcType=VARCHAR},#{channel,jdbcType=VARCHAR},systimestamp,systimestamp,#{bonus,jdbcType=BIGINT},#{reason,jdbcType=VARCHAR},'SFORDERNO'||SEQ_BALANCE_PAY_ORDER_NO.Nextval
+    	)  
+	</insert> 
+	
+	<insert id="addExchangeRetryLog" parameterType="INTEGER" >  
+	 	insert into EXCHANGE_RETRY
+	 	(
+	 		RETRY_ID,ORG_ID,CREATE_TIME
+	 	)
+	 	values  
+	    (
+	    	SEQ_EXCHANGE_RETRY_ID.Nextval,#{orgId},systimestamp
+    	)  
+	</insert>
+	
+	<insert id="addPayLog">  
+	 	insert into PAY_LOG
+	 	(
+	 		LOG_ID,ORG_ID,CREATE_TIME,PAY_ORDER_NO,REASON
+	 	)
+	 	values  
+	    (
+	    	SEQ_PAY_LOG_ID.Nextval,#{orgId, jdbcType=INTEGER},systimestamp,#{payOrderNo,jdbcType=VARCHAR},#{reason,jdbcType=VARCHAR}
+    	)
+	</insert>
+	
+	<select id="getNewPayOrderNO" resultType="String" >
+		select 'SFORDERNO'||SEQ_BALANCE_PAY_ORDER_NO.Nextval from dual
+	</select>
+	<select id="findByOrderNo" resultMap="ExchangeInfoMap" >
+		select ID, MEMBER_NO, ORDER_NO, LOTTERY_SN, LOTTERY_PAY_NO, EX_STATUS,
+           	   DM, RETRY_TIMES, PAY_RETRY_TIMES, MOBILE,CHANNEL, CREATE_TIME, UPDATE_TIME , BONUS, REASON, PAY_ORDER_NO
+           	from LOTTERY_EXCHANGE
+		       where PAY_ORDER_NO = #{orderNo}
+	</select>
+	
+	<select id="findPaidExchange" resultMap="ExchangeInfoMap" >
+		select * from 
+			( 
+				select row_.*, rownum rownum_ from 
+				(
+					select t.order_no,
+					       t.lottery_sn,
+					       t.update_time,
+					       t.bonus
+					  from lottery_exchange t
+					 where t.ex_status = 'PAID'
+					   <![CDATA[ and update_time >= trunc(sysdate-1)
+					   and update_time < trunc(sysdate)]]>
+			) row_ where <![CDATA[ rownum <= #{toIndex}) t where rownum_ > #{offsetIndex} ]]>
+	</select>
+	
+	<select id="findPaidExchangeCount" resultType="java.lang.Integer" >
+		select count(1) from 
+			( 
+				select t.order_no,
+					       t.lottery_sn,
+					       t.update_time,
+					       t.bonus
+				  from lottery_exchange t
+				 where t.ex_status = 'PAID'
+				  <![CDATA[  and update_time >= trunc(sysdate-1)
+				   and update_time < trunc(sysdate)]]>
+			)
+	</select>
+	
+	<select id="findExchangeCntByMemberNo" resultType="java.lang.Integer" >
+		select count(1) from lottery_exchange
+			where member_no=#{memberNo,jdbcType=INTEGER}
+	</select>
+	
+	<select id="findExchangeCntByMemberNoOneSecond" resultType="java.lang.Integer" >
+		select count(1) from lottery_exchange
+			where member_no=#{memberNo,jdbcType=INTEGER}
+			  and create_time > sysdate-1/1440
+	</select>
+	
+	<select id="getSfcHomeData" resultMap="sfcMap" >
+		select nvl(sum(t.bonus), 0) total_amt,
+	       	   nvl(count(t.bonus), 0) win_cnt,
+	           nvl(max(t.bonus), 0) max_amt
+	      from (select distinct 
+	      				le.lottery_sn,
+	                    le.bonus from LOTTERY_EXCHANGE le
+	        where le.member_no = #{memberNo,jdbcType=INTEGER}
+	        and ex_status in ('PAYING','PAID','PAY_FAIL')) t
+	</select>
+	<select id="findByLotterySnAndPayNo" resultMap="ExchangeInfoMap" >
+		select ID, MEMBER_NO, ORDER_NO, LOTTERY_SN, LOTTERY_PAY_NO, EX_STATUS,
+           	   DM, RETRY_TIMES, PAY_RETRY_TIMES, MOBILE,CHANNEL, CREATE_TIME, UPDATE_TIME ,BONUS,REASON, PAY_ORDER_NO
+           	from LOTTERY_EXCHANGE
+		       where LOTTERY_SN = #{lotterySn} and LOTTERY_PAY_NO = #{lotteryPayNo}
+	</select>
+	<select id="findOrderById" resultMap="ExchangeInfoMap" >
+		select ID, MEMBER_NO, ORDER_NO, LOTTERY_SN, LOTTERY_PAY_NO, EX_STATUS,
+           	   DM, RETRY_TIMES, PAY_RETRY_TIMES, MOBILE,CHANNEL, CREATE_TIME, UPDATE_TIME ,BONUS,REASON, PAY_ORDER_NO
+           	from LOTTERY_EXCHANGE
+		       where ID = #{id}
+	</select>
+	
+	<select id="findByLotterySnAndStatus" resultMap="ExchangeInfoMap" >
+		select ID, MEMBER_NO, ORDER_NO, LOTTERY_SN, LOTTERY_PAY_NO, EX_STATUS,
+           	   DM, RETRY_TIMES, PAY_RETRY_TIMES, MOBILE,CHANNEL, CREATE_TIME, UPDATE_TIME ,BONUS,REASON, PAY_ORDER_NO
+           	from LOTTERY_EXCHANGE
+		       where LOTTERY_SN = #{lotterySn} and EX_STATUS = #{status}
+	</select>
+	
+	<update id="updatePayOrderNo" >
+		update LOTTERY_EXCHANGE 
+			<set>	
+				PAY_RETRY_TIMES = PAY_RETRY_TIMES+1,EX_STATUS =#{status},REASON =#{reason},UPDATE_TIME = systimestamp,PAY_ORDER_NO=#{payOrderNo}
+			</set> 
+			where ID=#{id}
+	</update>
+	<update id="updateExchangeStatus" >
+		update LOTTERY_EXCHANGE 
+			<set>	
+				EX_STATUS =#{status},UPDATE_TIME = systimestamp 
+			</set> 
+			where ID=#{id}  and EX_STATUS = #{orgStatus}
+	</update>
+	
+	<update id="updateExchangeStatusAndBonus" >
+		update LOTTERY_EXCHANGE 
+			<set>	
+				EX_STATUS =#{status},BONUS =#{bonus},UPDATE_TIME = systimestamp 
+			</set> 
+			where ID=#{id}  and EX_STATUS = #{orgStatus}
+	</update>
+	
+	<update id="updateExchangeStatusAndReason" >
+		update LOTTERY_EXCHANGE 
+			<set>	
+				EX_STATUS =#{status},REASON =#{reason},UPDATE_TIME = systimestamp 
+			</set> 
+			where ID=#{id}  and EX_STATUS = #{orgStatus}
+	</update>
+	
+	<update id="updateExchangeStatusAndReasonAndRetryTimes" >
+		update LOTTERY_EXCHANGE 
+			<set>	
+				PAY_RETRY_TIMES = PAY_RETRY_TIMES+1,EX_STATUS =#{status},REASON =#{reason},UPDATE_TIME = systimestamp 
+			</set> 
+			where ID=#{id}  and EX_STATUS = #{orgStatus}
+	</update>
+	
+	<update id="updateExchange" parameterType="exchangeInfo">
+		update LOTTERY_EXCHANGE 
+			<set>	
+			    LOTTERY_SN=#{lotterySn, jdbcType=VARCHAR},LOTTERY_PAY_NO=#{lotteryPayNo, jdbcType=VARCHAR},DM=#{dm, jdbcType=VARCHAR},
+			    MOBILE=#{mobile, jdbcType=VARCHAR},CHANNEL=#{channel, jdbcType=VARCHAR},
+				RETRY_TIMES = RETRY_TIMES+1,UPDATE_TIME = systimestamp 
+			</set> 
+			where ID=#{id, jdbcType=INTEGER} and  EX_STATUS = 'INIT'
+	</update>
+	
+	<update id="updatePayRetryTimes">
+		update LOTTERY_EXCHANGE 
+			<set>	
+				PAY_RETRY_TIMES = PAY_RETRY_TIMES+1,UPDATE_TIME = systimestamp 
+			</set> 
+			where ID=#{id}  
+	</update>
+	<select id="findExchangePageList" resultMap="ExchangeInfoMap">
+      select * from 
+		( 
+			select row_.*, rownum rownum_ from 
+			(
+				select le.id,
+					   decode(le.dm, null, le.lottery_sn, substr(le.lottery_sn, 0 ,18)) lottery_sn,
+				       le.mobile,
+				       le.bonus bonus,
+				       le.create_time,
+				       le.channel,
+				       le.ex_status,
+				       le.reason
+				 from  LOTTERY_EXCHANGE le
+				 where 1=1
+				 <if test="param.lotterySn != null and param.lotterySn != ''">
+				 	and le.lottery_sn like #{param.lotterySn,jdbcType=VARCHAR}||'%'
+				 </if>
+				 <if test="param.mobile != null and param.mobile != ''">
+				 	and le.mobile=#{param.mobile,jdbcType=VARCHAR}
+				 </if>
+				 <if test="param.startTime != null and param.startTime != ''">
+				 	<![CDATA[and le.create_time >= to_date(#{param.startTime,jdbcType=VARCHAR},'yyyy-mm-dd hh24:mi:ss') ]]>
+				 </if>
+				 <if test="param.startTime2 != null and param.startTime2 != ''">
+				 	<![CDATA[and le.create_time <= to_date(#{param.startTime2,jdbcType=VARCHAR},'yyyy-mm-dd hh24:mi:ss') ]]>
+				 </if>
+				 <if test="param.status != null and param.status != '' and param.status == 'ALL'">
+				 	and le.ex_status in ('PAYING','PAID','PAY_FAIL')
+				 </if>
+				 <if test="param.status != null and param.status != '' and param.status != 'ALL'">
+				 	and le.ex_status=#{param.status,jdbcType=VARCHAR}
+				 </if>
+				order by le.create_time desc
+		) row_ where <![CDATA[ rownum <= #{toIndex}) t where rownum_ > #{offsetIndex} ]]>
+  </select>
+  
+  <select id="getExchangeCount" resultType="java.lang.Integer">
+      select count(1) from (
+   				select le.id,
+					   decode(le.dm, null, le.lottery_sn, substr(le.lottery_sn, 0 ,18)) lottery_sn,
+				       le.mobile,
+				       le.dm,
+				       le.bonus,
+				       le.create_time,
+				       le.channel,
+				       le.ex_status,
+				       le.reason
+				 from  LOTTERY_EXCHANGE le
+				 where 1=1
+				 <if test="param.lotterySn != null and param.lotterySn != ''">
+				 	and le.lottery_sn like #{param.lotterySn,jdbcType=VARCHAR}||'%'
+				 </if>
+				 <if test="param.mobile != null and param.mobile != ''">
+				 	and le.mobile=#{param.mobile,jdbcType=VARCHAR}
+				 </if>
+				 <if test="param.startTime != null and param.startTime != ''">
+				 	<![CDATA[and le.create_time >= to_date(#{param.startTime,jdbcType=VARCHAR},'yyyy-mm-dd hh24:mi:ss') ]]>
+				 </if>
+				 <if test="param.startTime2 != null and param.startTime2 != ''">
+				 	<![CDATA[and le.create_time <= to_date(#{param.startTime2,jdbcType=VARCHAR},'yyyy-mm-dd hh24:mi:ss') ]]>
+				 </if>
+				 <if test="param.status != null and param.status != '' and param.status == 'ALL'">
+				 	and le.ex_status in ('PAYING','PAID','PAY_FAIL')
+				 </if>
+				 <if test="param.status != null and param.status != '' and param.status != 'ALL'">
+				 	and le.ex_status=#{param.status,jdbcType=VARCHAR}
+				 </if>
+      )
+  </select>
+	
+	
+</mapper>
