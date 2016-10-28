@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="30 seconds" debug="true">
-	<include resource="${profile.logIncFile}" />
+	<include resource="logback-inc.xml" />
+<!-- 	<include resource="${profile.logIncFile}" /> -->
 </configuration>

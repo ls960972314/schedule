@@ -19,7 +19,7 @@ public class BooleanTypeHandler implements TypeHandler {
         String str = arg0.getString(arg1);  
         if ("y".equalsIgnoreCase(str)){  
             return Boolean.TRUE;  
-        }  
+        }
         return Boolean.FALSE;   
     }  
   

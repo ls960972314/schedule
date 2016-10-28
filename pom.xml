@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+﻿<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>schedule</groupId>
@@ -22,20 +22,45 @@
 		<jsp-api.version>2.0</jsp-api.version>
 		<jstl-api.version>1.2-rev-1</jstl-api.version>
 		<taglibs.version>1.1.2</taglibs.version>
-		<quartz.version>1.6.3</quartz.version>
 		<commons-codec.version>1.6</commons-codec.version>
 		<commons-dbcp.version>1.4</commons-dbcp.version>
 		<fastjson.version>1.1.41</fastjson.version>
-		<slf4j-api.version>1.7.0</slf4j-api.version>
-		<logback.version>1.1.2</logback.version>
-		<logback-ext.version>0.1.1</logback-ext.version>
 		<commons.version>1.4</commons.version>
-		<commons-fileupload.version>1.3.1</commons-fileupload.version>
 		<commons-io.version>2.4</commons-io.version>
+		<quartz.version>2.2.1</quartz.version>
 	</properties>
 	
 	
 	<dependencies>
+		<!-- logback 单独配置，避免 fms-skeleton 传递依赖为 1.0.13 版本 -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>1.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>janino</groupId>
+			<artifactId>janino</artifactId>
+			<version>2.5.10</version>
+		</dependency>
+		<!-- logback end -->
+		<!-- quartz begin -->
+		<dependency>
+		    <groupId>org.quartz-scheduler</groupId>
+		    <artifactId>quartz</artifactId>
+		    <version>${quartz.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.quartz-scheduler</groupId>
+		    <artifactId>quartz-jobs</artifactId>
+		    <version>${quartz.version}</version>
+		</dependency>
+		<!-- quartz end -->
 		<!-- mybaits begin -->
 		<dependency>
 			<groupId>org.mybatis</groupId>
@@ -162,11 +187,6 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>${commons-io.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>opensymphony</groupId>
-			<artifactId>quartz</artifactId>
-			<version>${quartz.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
