@@ -33,9 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 
 /**
- * This Example will demonstrate all of the basics of scheduling capabilities of Quartz using Cron Triggers.
- * 
- * @author Bill Kratzer
+ * 使用Cron Triggers展示所有的scheduler的基本功能
  */
 public class CronTriggerExample {
 
@@ -47,88 +45,69 @@ public class CronTriggerExample {
     // First we must get a reference to a scheduler
     SchedulerFactory sf = new StdSchedulerFactory();
     Scheduler sched = sf.getScheduler();
-
     log.info("------- Initialization Complete --------");
-
     log.info("------- Scheduling Jobs ----------------");
 
-    // jobs can be scheduled before sched.start() has been called
-
-    // job 1 will run every 20 seconds
+    // job 可以在sched.start()调用前被设定好
+    
+    // job1 将每20秒执行一次
     JobDetail job = newJob(SimpleJob.class).withIdentity("job1", "group1").build();
-
-    CronTrigger trigger = newTrigger().withIdentity("trigger1", "group1").withSchedule(cronSchedule("0/20 * * * * ?"))
-        .build();
-
+    CronTrigger trigger = newTrigger().withIdentity("trigger1", "group1").
+    		withSchedule(cronSchedule("0/20 * * * * ?")).build();
     Date ft = sched.scheduleJob(job, trigger);
     log.info(job.getKey() + " has been scheduled to run at: " + ft + " and repeat based on expression: "
              + trigger.getCronExpression());
 
-    // job 2 will run every other minute (at 15 seconds past the minute)
+    // job2 每隔2分钟执行一次,在每分钟的第15秒开始执行
     job = newJob(SimpleJob.class).withIdentity("job2", "group1").build();
-
-    trigger = newTrigger().withIdentity("trigger2", "group1").withSchedule(cronSchedule("15 0/2 * * * ?")).build();
-
+    trigger = newTrigger().withIdentity("trigger2", "group1").
+    		withSchedule(cronSchedule("15 0/2 * * * ?")).build();
     ft = sched.scheduleJob(job, trigger);
     log.info(job.getKey() + " has been scheduled to run at: " + ft + " and repeat based on expression: "
              + trigger.getCronExpression());
 
-    // job 3 will run every other minute but only between 8am and 5pm
+    // job3 每隔2分钟执行一次,从上午8点到下午5点
     job = newJob(SimpleJob.class).withIdentity("job3", "group1").build();
-
     trigger = newTrigger().withIdentity("trigger3", "group1").withSchedule(cronSchedule("0 0/2 8-17 * * ?")).build();
-
     ft = sched.scheduleJob(job, trigger);
     log.info(job.getKey() + " has been scheduled to run at: " + ft + " and repeat based on expression: "
              + trigger.getCronExpression());
 
-    // job 4 will run every three minutes but only between 5pm and 11pm
+    // job4 每隔3分钟执行一次,从下午5点到下午11点
     job = newJob(SimpleJob.class).withIdentity("job4", "group1").build();
-
     trigger = newTrigger().withIdentity("trigger4", "group1").withSchedule(cronSchedule("0 0/3 17-23 * * ?")).build();
-
     ft = sched.scheduleJob(job, trigger);
     log.info(job.getKey() + " has been scheduled to run at: " + ft + " and repeat based on expression: "
              + trigger.getCronExpression());
 
-    // job 5 will run at 10am on the 1st and 15th days of the month
+    // job5 在每个月1号到15号的上午10点执行
     job = newJob(SimpleJob.class).withIdentity("job5", "group1").build();
-
     trigger = newTrigger().withIdentity("trigger5", "group1").withSchedule(cronSchedule("0 0 10am 1,15 * ?")).build();
-
     ft = sched.scheduleJob(job, trigger);
     log.info(job.getKey() + " has been scheduled to run at: " + ft + " and repeat based on expression: "
              + trigger.getCronExpression());
 
-    // job 6 will run every 30 seconds but only on Weekdays (Monday through Friday)
+    // job6 在每个周一到周五每隔30秒执行一次
     job = newJob(SimpleJob.class).withIdentity("job6", "group1").build();
-
     trigger = newTrigger().withIdentity("trigger6", "group1").withSchedule(cronSchedule("0,30 * * ? * MON-FRI"))
         .build();
-
     ft = sched.scheduleJob(job, trigger);
     log.info(job.getKey() + " has been scheduled to run at: " + ft + " and repeat based on expression: "
              + trigger.getCronExpression());
 
-    // job 7 will run every 30 seconds but only on Weekends (Saturday and Sunday)
+    // job7 在每个周六周末每隔30秒执行一次
     job = newJob(SimpleJob.class).withIdentity("job7", "group1").build();
-
     trigger = newTrigger().withIdentity("trigger7", "group1").withSchedule(cronSchedule("0,30 * * ? * SAT,SUN"))
         .build();
-
     ft = sched.scheduleJob(job, trigger);
     log.info(job.getKey() + " has been scheduled to run at: " + ft + " and repeat based on expression: "
              + trigger.getCronExpression());
-
+    
     log.info("------- Starting Scheduler ----------------");
-
-    // All of the jobs have been added to the scheduler, but none of the
-    // jobs
-    // will run until the scheduler has been started
+    // 所有的job都加入了scheduler,直到scheduler执行start方法才会被执行
     sched.start();
-
     log.info("------- Started Scheduler -----------------");
-
+    
     log.info("------- Waiting five minutes... ------------");
     try {
       // wait five minutes to show jobs
@@ -139,18 +118,14 @@ public class CronTriggerExample {
     }
 
     log.info("------- Shutting Down ---------------------");
-
     sched.shutdown(true);
-
     log.info("------- Shutdown Complete -----------------");
 
     SchedulerMetaData metaData = sched.getMetaData();
     log.info("Executed " + metaData.getNumberOfJobsExecuted() + " jobs.");
-
   }
 
   public static void main(String[] args) throws Exception {
-
     CronTriggerExample example = new CronTriggerExample();
     example.run();
   }

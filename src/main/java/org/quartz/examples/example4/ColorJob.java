@@ -30,26 +30,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <p>
- * This is just a simple job that receives parameters and
- * maintains state
- * </p>
- * 
- * @author Bill Kratzer
+ * job
  */
-@PersistJobDataAfterExecution
-@DisallowConcurrentExecution
+@PersistJobDataAfterExecution // 将jobDataMap中的数据存储起来,多任务时可以传递参数
+@DisallowConcurrentExecution  // 不允许任务并发执行
 public class ColorJob implements Job {
 
     private static Logger _log = LoggerFactory.getLogger(ColorJob.class);
     
-    // parameter names specific to this job
+    // 指定这个job的参数名
     public static final String FAVORITE_COLOR = "favorite color";
     public static final String EXECUTION_COUNT = "count";
     
-    // Since Quartz will re-instantiate a class every time it
-    // gets executed, members non-static member variables can
-    // not be used to maintain state!
+    // quartz会在每次执行的时候重新初始化,变量中不是static状态的变量无法被维护
     private int _counter = 1;
 
     /**

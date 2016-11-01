@@ -34,8 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Demonstrates the behavior of <code>JobListener</code>s. In particular, this example will use a job listener to
- * trigger another job after one job succesfully executes.
+ * 展示如何使用JobListener来监听一个job,在job1成功执行完后执行job2
  */
 public class ListenerExample {
 
@@ -51,28 +50,17 @@ public class ListenerExample {
     log.info("------- Initialization Complete -----------");
 
     log.info("------- Scheduling Jobs -------------------");
-
-    // schedule a job to run immediately
-
     JobDetail job = newJob(SimpleJob1.class).withIdentity("job1").build();
-
     Trigger trigger = newTrigger().withIdentity("trigger1").startNow().build();
-
-    // Set up the listener
+    // 设置一个监听器
     JobListener listener = new Job1Listener();
     Matcher<JobKey> matcher = KeyMatcher.keyEquals(job.getKey());
     sched.getListenerManager().addJobListener(listener, matcher);
-
-    // schedule the job to run
     sched.scheduleJob(job, trigger);
 
-    // All of the jobs have been added to the scheduler, but none of the jobs
-    // will run until the scheduler has been started
     log.info("------- Starting Scheduler ----------------");
     sched.start();
 
-    // wait 30 seconds:
-    // note: nothing will run
     log.info("------- Waiting 30 seconds... --------------");
     try {
       // wait 30 seconds to show jobs

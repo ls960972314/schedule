@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 
 /**
- * This Example will demonstrate how Triggers are ordered by priority.
+ * 展示Triggers如何被priority排序
  */
 public class PriorityExample {
 
@@ -43,7 +43,7 @@ public class PriorityExample {
     log.info("------- Initializing ----------------------");
 
     // First we must get a reference to a scheduler
-    SchedulerFactory sf = new StdSchedulerFactory("org/quartz/examples/example14/quartz_priority.properties");
+    SchedulerFactory sf = new StdSchedulerFactory();
     Scheduler sched = sf.getScheduler();
 
     log.info("------- Initialization Complete -----------");

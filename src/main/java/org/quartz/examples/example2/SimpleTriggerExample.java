@@ -37,9 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 
 /**
- * This Example will demonstrate all of the basics of scheduling capabilities of Quartz using Simple Triggers.
- * 
- * @author Bill Kratzer
+ * 使用Simple Triggers展示所有的scheduler的基本功能
  */
 public class SimpleTriggerExample {
 
@@ -56,128 +54,98 @@ public class SimpleTriggerExample {
 
     log.info("------- Scheduling Jobs ----------------");
 
-    // jobs can be scheduled before sched.start() has been called
-
-    // get a "nice round" time a few seconds in the future...
+    //job1 跑一次
     Date startTime = DateBuilder.nextGivenSecondDate(null, 15);
-
-    // job1 will only fire once at date/time "ts"
     JobDetail job = newJob(SimpleJob.class).withIdentity("job1", "group1").build();
-
     SimpleTrigger trigger = (SimpleTrigger) newTrigger().withIdentity("trigger1", "group1").startAt(startTime).build();
-
-    // schedule it to run!
     Date ft = sched.scheduleJob(job, trigger);
     log.info(job.getKey() + " will run at: " + ft + " and repeat: " + trigger.getRepeatCount() + " times, every "
              + trigger.getRepeatInterval() / 1000 + " seconds");
 
-    // job2 will only fire once at date/time "ts"
+    // job2 跑一次
     job = newJob(SimpleJob.class).withIdentity("job2", "group1").build();
-
     trigger = (SimpleTrigger) newTrigger().withIdentity("trigger2", "group1").startAt(startTime).build();
-
     ft = sched.scheduleJob(job, trigger);
     log.info(job.getKey() + " will run at: " + ft + " and repeat: " + trigger.getRepeatCount() + " times, every "
              + trigger.getRepeatInterval() / 1000 + " seconds");
 
-    // job3 will run 11 times (run once and repeat 10 more times)
-    // job3 will repeat every 10 seconds
+    // job3 跑11次,第一次跑+重复10次,每10秒重复一次
     job = newJob(SimpleJob.class).withIdentity("job3", "group1").build();
-
     trigger = newTrigger().withIdentity("trigger3", "group1").startAt(startTime)
         .withSchedule(simpleSchedule().withIntervalInSeconds(10).withRepeatCount(10)).build();
-
     ft = sched.scheduleJob(job, trigger);
     log.info(job.getKey() + " will run at: " + ft + " and repeat: " + trigger.getRepeatCount() + " times, every "
              + trigger.getRepeatInterval() / 1000 + " seconds");
 
-    // the same job (job3) will be scheduled by a another trigger
-    // this time will only repeat twice at a 70 second interval
-
+    // 同样的job3会执行 3次,第一次跑+重复2次,每10秒重复一次
     trigger = newTrigger().withIdentity("trigger3", "group2").startAt(startTime)
         .withSchedule(simpleSchedule().withIntervalInSeconds(10).withRepeatCount(2)).forJob(job).build();
-
     ft = sched.scheduleJob(trigger);
     log.info(job.getKey() + " will [also] run at: " + ft + " and repeat: " + trigger.getRepeatCount()
              + " times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
-
-    // job4 will run 6 times (run once and repeat 5 more times)
-    // job4 will repeat every 10 seconds
+    
+    // job4 跑11次,第一次跑+重复5次,每10秒重复一次
     job = newJob(SimpleJob.class).withIdentity("job4", "group1").build();
-
     trigger = newTrigger().withIdentity("trigger4", "group1").startAt(startTime)
         .withSchedule(simpleSchedule().withIntervalInSeconds(10).withRepeatCount(5)).build();
-
     ft = sched.scheduleJob(job, trigger);
     log.info(job.getKey() + " will run at: " + ft + " and repeat: " + trigger.getRepeatCount() + " times, every "
              + trigger.getRepeatInterval() / 1000 + " seconds");
 
-    // job5 will run once, five minutes in the future
+    // job5 跑一次,5分钟之后
     job = newJob(SimpleJob.class).withIdentity("job5", "group1").build();
-
     trigger = (SimpleTrigger) newTrigger().withIdentity("trigger5", "group1")
         .startAt(futureDate(5, IntervalUnit.MINUTE)).build();
-
     ft = sched.scheduleJob(job, trigger);
     log.info(job.getKey() + " will run at: " + ft + " and repeat: " + trigger.getRepeatCount() + " times, every "
              + trigger.getRepeatInterval() / 1000 + " seconds");
-
-    // job6 will run indefinitely, every 40 seconds
+    
+    // job6 将永久的跑下去,每40秒一次
     job = newJob(SimpleJob.class).withIdentity("job6", "group1").build();
-
     trigger = newTrigger().withIdentity("trigger6", "group1").startAt(startTime)
         .withSchedule(simpleSchedule().withIntervalInSeconds(40).repeatForever()).build();
-
     ft = sched.scheduleJob(job, trigger);
     log.info(job.getKey() + " will run at: " + ft + " and repeat: " + trigger.getRepeatCount() + " times, every "
              + trigger.getRepeatInterval() / 1000 + " seconds");
-
     log.info("------- Starting Scheduler ----------------");
-
-    // All of the jobs have been added to the scheduler, but none of the jobs
-    // will run until the scheduler has been started
+    
+    // 所有的job都加入了scheduler,直到scheduler执行start方法才会被执行
     sched.start();
-
     log.info("------- Started Scheduler -----------------");
-
-    // jobs can also be scheduled after start() has been called...
-    // job7 will repeat 20 times, repeat every five minutes
+    
+    // job 也可以在scheduled执行start方法后加入调度任务
+    
+    // job7 跑21次,第一次跑+重复20次,每5分钟跑一次
     job = newJob(SimpleJob.class).withIdentity("job7", "group1").build();
-
     trigger = newTrigger().withIdentity("trigger7", "group1").startAt(startTime)
         .withSchedule(simpleSchedule().withIntervalInMinutes(5).withRepeatCount(20)).build();
-
     ft = sched.scheduleJob(job, trigger);
     log.info(job.getKey() + " will run at: " + ft + " and repeat: " + trigger.getRepeatCount() + " times, every "
              + trigger.getRepeatInterval() / 1000 + " seconds");
-
-    // jobs can be fired directly... (rather than waiting for a trigger)
+    
+    // job也可以直接执行(而不是等待一个触发器)
     job = newJob(SimpleJob.class).withIdentity("job8", "group1").storeDurably().build();
-
     sched.addJob(job, true);
-
     log.info("'Manually' triggering job8...");
     sched.triggerJob(jobKey("job8", "group1"));
-
+    
+    
     log.info("------- Waiting 30 seconds... --------------");
-
     try {
-      // wait 33 seconds to show jobs
-      Thread.sleep(30L * 1000L);
-      // executing...
-    } catch (Exception e) {
-      //
-    }
-
-    // jobs can be re-scheduled...
-    // job 7 will run immediately and repeat 10 times for every second
+        // wait 33 seconds to show jobs
+        Thread.sleep(30L * 1000L);
+        // executing...
+      } catch (Exception e) {
+        //
+      }
+    // job也可以重新设置
+    // job7 将马上执行一次,然后重复10次,每秒执行1次
     log.info("------- Rescheduling... --------------------");
     trigger = newTrigger().withIdentity("trigger7", "group1").startAt(startTime)
-        .withSchedule(simpleSchedule().withIntervalInMinutes(5).withRepeatCount(20)).build();
+        .withSchedule(simpleSchedule().withIntervalInSeconds(1).withRepeatCount(10)).build();
 
     ft = sched.rescheduleJob(trigger.getKey(), trigger);
     log.info("job7 rescheduled to run at: " + ft);
-
     log.info("------- Waiting five minutes... ------------");
     try {
       // wait five minutes to show jobs
@@ -186,17 +154,15 @@ public class SimpleTriggerExample {
     } catch (Exception e) {
       //
     }
-
+    
     log.info("------- Shutting Down ---------------------");
-
     sched.shutdown(true);
-
     log.info("------- Shutdown Complete -----------------");
-
-    // display some stats about the schedule that just ran
+    
+    // 展示一些有关刚刚执行的调度的统计值
     SchedulerMetaData metaData = sched.getMetaData();
     log.info("Executed " + metaData.getNumberOfJobsExecuted() + " jobs.");
-
+	
   }
 
   public static void main(String[] args) throws Exception {

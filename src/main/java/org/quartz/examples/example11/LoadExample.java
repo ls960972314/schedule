@@ -32,9 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This example will spawn a large number of jobs to run
- * 
- * @author James House, Bill Kratzer
+ * 展示如何执行大量的job
  */
 public class LoadExample {
 
@@ -53,15 +51,10 @@ public class LoadExample {
 
     log.info("------- Initialization Complete -----------");
 
-    // schedule 500 jobs to run
+    // 执行500个job
     for (int count = 1; count <= _numberOfJobs; count++) {
-      JobDetail job = newJob(SimpleJob.class).withIdentity("job" + count, "group_1").requestRecovery() // ask scheduler
-                                                                                                       // to re-execute
-                                                                                                       // this job if it
-                                                                                                       // was in
-                                                                                                       // progress when
-                                                                                                       // the scheduler
-                                                                                                       // went down...
+      //重新执行失败的job
+      JobDetail job = newJob(SimpleJob.class).withIdentity("job" + count, "group_1").requestRecovery()
           .build();
 
       // tell the job to delay some small amount... to simulate work...

@@ -29,22 +29,17 @@ import org.quartz.UnableToInterruptJobException;
 
 
 /**
- * <p>
- * A dumb implementation of an InterruptableJob, for unit testing purposes.
- * </p>
- * 
- * @author <a href="mailto:bonhamcm@thirdeyeconsulting.com">Chris Bonham</a>
- * @author Bill Kratzer
+ * 展示如何打断一个job及打断后job的处理
  */
 public class DumbInterruptableJob implements InterruptableJob {
     
     // logging services
     private static Logger _log = LoggerFactory.getLogger(DumbInterruptableJob.class);
     
-    // has the job been interrupted?
+    // job是否被打断
     private boolean _interrupted = false;
 
-    // job name 
+    // job名 
     private JobKey _jobKey = null;
     
     /**
@@ -72,9 +67,7 @@ public class DumbInterruptableJob implements InterruptableJob {
         _log.info("---- " + _jobKey + " executing at " + new Date());
 
         try {
-            // main job loop... see the JavaDOC for InterruptableJob for discussion...
-            // do some work... in this example we are 'simulating' work by sleeping... :)
-
+        	// 模仿业务执行
             for (int i = 0; i < 4; i++) {
                 try {
                     Thread.sleep(1000L);
@@ -82,12 +75,11 @@ public class DumbInterruptableJob implements InterruptableJob {
                     ignore.printStackTrace();
                 }
                 
-                // periodically check if we've been interrupted...
+                // 检查是否被打断
                 if(_interrupted) {
                     _log.info("--- " + _jobKey + "  -- Interrupted... bailing out!");
-                    return; // could also choose to throw a JobExecutionException 
-                             // if that made for sense based on the particular  
-                             // job's responsibilities/behaviors
+                    //也可以抛出一个JobExecutionException,让其重新执行
+                    return;
                 }
             }
             
@@ -95,13 +87,8 @@ public class DumbInterruptableJob implements InterruptableJob {
             _log.info("---- " + _jobKey + " completed at " + new Date());
         }
     }
-    
     /**
-     * <p>
-     * Called by the <code>{@link Scheduler}</code> when a user
-     * interrupts the <code>Job</code>.
-     * </p>
-     * 
+     * 当一个用户打断了这个job,此方法执行
      * @return void (nothing) if job interrupt is successful.
      * @throws JobExecutionException
      *           if there is an exception while interrupting the job.
@@ -110,5 +97,6 @@ public class DumbInterruptableJob implements InterruptableJob {
         _log.info("---" + _jobKey + "  -- INTERRUPTING --");
         _interrupted = true;
     }
+    
 
 }

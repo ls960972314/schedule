@@ -39,7 +39,7 @@ public class Job1Listener implements JobListener {
   public String getName() {
     return "job1_to_job2";
   }
-
+  // 执行任务之前执行
   public void jobToBeExecuted(JobExecutionContext inContext) {
     _log.info("Job1Listener says: Job Is about to be executed.");
   }
@@ -48,6 +48,7 @@ public class Job1Listener implements JobListener {
     _log.info("Job1Listener says: Job Execution was vetoed.");
   }
 
+  // 执行任务后执行
   public void jobWasExecuted(JobExecutionContext inContext, JobExecutionException inException) {
     _log.info("Job1Listener says: Job was executed.");
 

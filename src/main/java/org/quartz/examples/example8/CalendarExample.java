@@ -38,8 +38,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
- * This example will demonstrate how calendars can be used to exclude periods of time when scheduling should not take
- * place.
+ * 展示如何使用calendar在执行调度时排除一个时间段
  */
 public class CalendarExample {
 
@@ -56,7 +55,7 @@ public class CalendarExample {
 
     log.info("------- Scheduling Jobs -------------------");
 
-    // Add the holiday calendar to the schedule
+    // 向调度中增加排除的假期时间
     AnnualCalendar holidays = new AnnualCalendar();
 
     // fourth of July (July 4)
@@ -69,34 +68,22 @@ public class CalendarExample {
     Calendar christmas = new GregorianCalendar(2005, 11, 25);
     holidays.setDayExcluded(christmas, true);
 
-    // tell the schedule about our holiday calendar
+    // calendar和schedule关联
     sched.addCalendar("holidays", holidays, false, false);
 
-    // schedule a job to run hourly, starting on halloween
-    // at 10 am
+    // 在万圣节开始执行调度,每小时跑一次
     Date runDate = dateOf(0, 0, 10, 31, 10);
-
     JobDetail job = newJob(SimpleJob.class).withIdentity("job1", "group1").build();
-
     SimpleTrigger trigger = newTrigger().withIdentity("trigger1", "group1").startAt(runDate)
         .withSchedule(simpleSchedule().withIntervalInHours(1).repeatForever()).modifiedByCalendar("holidays").build();
-
-    // schedule the job and print the first run date
     Date firstRunTime = sched.scheduleJob(job, trigger);
 
-    // print out the first execution date.
-    // Note: Since Halloween (Oct 31) is a holiday, then
-    // we will not run until the next day! (Nov 1)
+    // 打印出来的将要在圣诞节第二天执行(圣诞节被排除了)
     log.info(job.getKey() + " will run at: " + firstRunTime + " and repeat: " + trigger.getRepeatCount()
              + " times, every " + trigger.getRepeatInterval() / 1000 + " seconds");
 
-    // All of the jobs have been added to the scheduler, but none of the jobs
-    // will run until the scheduler has been started
     log.info("------- Starting Scheduler ----------------");
     sched.start();
-
-    // wait 30 seconds:
-    // note: nothing will run
     log.info("------- Waiting 30 seconds... --------------");
     try {
       // wait 30 seconds to show jobs

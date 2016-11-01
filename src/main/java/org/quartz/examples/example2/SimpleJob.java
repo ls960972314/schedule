@@ -56,8 +56,6 @@ public class SimpleJob implements Job {
     public void execute(JobExecutionContext context)
         throws JobExecutionException {
 
-        // This job simply prints out its job name and the
-        // date and time that it is running
         JobKey jobKey = context.getJobDetail().getKey();
         _log.info("SimpleJob says: " + jobKey + " executing at " + new Date());
     }

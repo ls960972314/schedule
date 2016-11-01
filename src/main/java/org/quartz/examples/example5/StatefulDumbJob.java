@@ -27,14 +27,11 @@ import org.quartz.PersistJobDataAfterExecution;
 import java.util.Date;
 
 /**
- * <p>
- * A dumb implementation of Job, for unit testing purposes.
- * </p>
  * 
- * @author James House
  */
-@PersistJobDataAfterExecution
-@DisallowConcurrentExecution
+//测试规则的时候不能加入该注释
+//@PersistJobDataAfterExecution
+//@DisallowConcurrentExecution
 public class StatefulDumbJob implements Job {
 
   /*
