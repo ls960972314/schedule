@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sfpay.sypay.lottery.dao.IExchangeDao">
 
-   <resultMap id="ExchangeInfoMap"	     type="com.sfpay.sypay.lottery.exchange.valueobject.dto.ExchangeInfo">	
+  <!--  <resultMap id="ExchangeInfoMap"	     type="com.sfpay.sypay.lottery.exchange.valueobject.dto.ExchangeInfo">	
         <result column="ID"          jdbcType="INTEGER" 	property="id"/>	
 		<result column="MEMBER_NO"          jdbcType="INTEGER" 	property="memberNo"/>	
 		<result column="ORDER_NO"        jdbcType="VARCHAR" 	property="orderNo"/>
@@ -268,7 +268,7 @@
 				 	and le.ex_status=#{param.status,jdbcType=VARCHAR}
 				 </if>
       )
-  </select>
+  </select> -->
 	
 	
 </mapper>
