@@ -14,7 +14,7 @@
 	</context:component-scan>
 	
 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
-     <mvc:annotation-driven/> 
+    <mvc:annotation-driven/> 
 	
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"
 		p:prefix="/WEB-INF/view/" p:suffix=".jsp" />

@@ -24,7 +24,7 @@
 	<context:component-scan base-package="com.schedule.service.*">
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
 	</context:component-scan>
-	
+	<bean id="contextHelper" class="com.schedule.common.util.ContextHelper"/>
     <bean id="config" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
         <property name="properties" ref="propertyConfigurer" />
     </bean>
