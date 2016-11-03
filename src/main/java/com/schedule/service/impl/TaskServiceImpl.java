@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.schedule.domain.GroupTask;
 import com.schedule.domain.Task;
+import com.schedule.domain.vo.GroupTask;
 import com.schedule.service.TaskService;
 
 @Service(value="taskService")
@@ -43,7 +43,7 @@ public class TaskServiceImpl implements TaskService {
 		groupTask.setTaskList(list1);
 		groupList.add(groupTask);
 		
-		LinkedList<Task> list2 = new LinkedList<Task>();
+		/*LinkedList<Task> list2 = new LinkedList<Task>();
 		Task task4 = new Task();
 		task4.setId(4l);
 		task4.setGroupName("defaultGroup");
@@ -61,7 +61,7 @@ public class TaskServiceImpl implements TaskService {
 		GroupTask groupTask2 = new GroupTask();
 		groupTask2.setGroupName("defaultGroup");
 		groupTask2.setTaskList(list2);
-		groupList.add(groupTask2);
+		groupList.add(groupTask2);*/
 		return groupList;
 	}
 

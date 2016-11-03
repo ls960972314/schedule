@@ -9,5 +9,5 @@
         </property>   
     </bean>  
 <!--加载可执行的任务-->
-    <bean id="loadTask" class="com.schedule.task.LoadTask"  init-method="initTask" />
+    <bean id="loadTask" class="com.schedule.componentPlugin.LoadTask"  init-method="initTask" />
 </beans>

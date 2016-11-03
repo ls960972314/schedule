@@ -2,7 +2,7 @@ package com.schedule.service;
 
 import java.util.List;
 
-import com.schedule.domain.GroupTask;
+import com.schedule.domain.vo.GroupTask;
 
 public interface TaskService {
 

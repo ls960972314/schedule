@@ -8,18 +8,9 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * 类说明：<br>
- *      应用上下文获取bean辅助类
- * 
- * <p>
- * 详细描述：<br>
- *      应用上下文获取bean辅助类
- * 
- * </p>
- * 
- * @author 483879 张玉龙
- * 
- * CreateDate: 2014-8-4
+ * 应用上下文获取bean辅助类
+ * @author 887961
+ * @Date 2016年11月2日 下午3:18:54
  */
 @Component
 public final class ContextHelper implements ApplicationContextAware {

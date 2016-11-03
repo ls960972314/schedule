@@ -13,7 +13,7 @@
 
 	<!-- Spring 容器启动监听器 -->
 	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+		<listener-class>com.schedule.componentPlugin.ContextLoaderListener</listener-class>
 	</listener>
 	
 	<servlet>
