@@ -15,11 +15,12 @@ import org.quartz.PersistJobDataAfterExecution;
 import org.quartz.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.schedule.common.Constants;
 import com.schedule.common.util.ContextHelper;
 import com.schedule.domain.Task;
-import com.schedule.interfaces.SqlTaskExcute;
+import com.schedule.interfaces.TaskExcute;
 
 /**
  * 根据组划分的job
@@ -30,24 +31,21 @@ import com.schedule.interfaces.SqlTaskExcute;
  */
 @PersistJobDataAfterExecution // 将jobDataMap中的数据存储起来,多任务时可以传递参数
 @DisallowConcurrentExecution  // 不允许任务并发执行
-public class GroupTaskJob implements Job, SqlTaskExcute {
+public class GroupTaskJob implements Job {
 	
 	private static Logger log = LoggerFactory.getLogger(GroupTaskJob.class);
+	
+	private TaskExcute sqlTaskExcute;
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		try {
+			sqlTaskExcute = ContextHelper.getInstance().getBean("sqlTaskExcute");
+			
 			log.info(String.format("job:%s开始执行", context.getJobDetail().getKey().toString()));
 			// 在这里执行你的任务...
-			excuteSql();
-			try {
-				// wait 2 seconds to show job
-				Thread.sleep(2l * 1000L);
-				// executing...
-			} catch (Exception e) {
-				//
-			}
+			sqlTaskExcute.excuteSql();
 			log.info(String.format("job:%s执行完毕", context.getJobDetail().getKey().toString()));
 			// 判断组中是否有要继续执行的任务
 			if (!context.getJobDetail().getJobDataMap().get(Constants.groupName).toString().equals(Constants.conCurrentGroupName)) {
@@ -77,10 +75,5 @@ public class GroupTaskJob implements Job, SqlTaskExcute {
             e2.setUnscheduleAllTriggers(true);
             throw e2;
 		}
-	}
-
-	@Override
-	public void excuteSql() {
-		log.info("执行数据库SQL...");
 	}
 }

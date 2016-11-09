@@ -21,7 +21,7 @@
 	</bean>
 	
     <!-- 扫描指定package下所有带有如@services,@resource,并把所注释的注册为Spring Beans,过滤扫描@controller注解 -->
-	<context:component-scan base-package="com.schedule.service.*">
+	<context:component-scan base-package="com.schedule.service.**.**">
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
 	</context:component-scan>
 	<bean id="contextHelper" class="com.schedule.common.util.ContextHelper"/>

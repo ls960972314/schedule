@@ -10,6 +10,11 @@ import com.schedule.domain.Task;
 import com.schedule.domain.vo.GroupTask;
 import com.schedule.service.TaskService;
 
+/**
+ * 任务实现
+ * @author 887961 
+ * @Date 2016年11月9日 下午6:32:11
+ */
 @Service(value="taskService")
 public class TaskServiceImpl implements TaskService {
 
